@@ -1,11 +1,11 @@
 package com.example.deviceservice.controllers;
 
 
-import com.example.devicesservice.dtos.DeleteDeviceFromUser;
-import com.example.devicesservice.dtos.FindDeviceByRoomName;
-import com.example.devicesservice.dtos.RenameDevice;
-import com.example.devicesservice.models.DevicesOwend;
-import com.example.devicesservice.services.UserServices;
+import com.example.deviceservice.dtos.DeleteDeviceFromUser;
+import com.example.deviceservice.dtos.FindDeviceByRoomName;
+import com.example.deviceservice.dtos.RenameDevice;
+import com.example.deviceservice.models.DevicesOwend;
+import com.example.deviceservice.services.UserServices;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;

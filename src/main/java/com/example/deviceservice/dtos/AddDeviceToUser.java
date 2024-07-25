@@ -1,6 +1,6 @@
 package com.example.deviceservice.dtos;
 
-import com.example.devicesservice.models.DevicesOwend;
+import com.example.deviceservice.models.DevicesOwend;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 

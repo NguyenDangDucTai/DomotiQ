@@ -1,6 +1,6 @@
 package com.example.deviceservice.repositories;
 
-import com.example.devicesservice.models.User;
+import com.example.deviceservice.models.User;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

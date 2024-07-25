@@ -1,9 +1,9 @@
 package com.example.deviceservice.services.impls;
 
-import com.example.devicesservice.dtos.AddNewDevice;
-import com.example.devicesservice.models.Device;
-import com.example.devicesservice.repositories.DeviceRepository;
-import com.example.devicesservice.services.DeviceServices;
+import com.example.deviceservice.dtos.AddNewDevice;
+import com.example.deviceservice.models.Device;
+import com.example.deviceservice.repositories.DeviceRepository;
+import com.example.deviceservice.services.DeviceServices;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;

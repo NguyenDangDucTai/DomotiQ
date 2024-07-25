@@ -1,8 +1,8 @@
 package com.example.deviceservice.controllers;
 
 
-import com.example.devicesservice.dtos.AddNewDevice;
-import com.example.devicesservice.services.DeviceServices;
+import com.example.deviceservice.dtos.AddNewDevice;
+import com.example.deviceservice.services.DeviceServices;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
