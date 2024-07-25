@@ -1,2 +1,8 @@
-package com.example.devicesservice.dtos;public class DeleteDeviceFromUser {
+package com.example.devicesservice.dtos;
+
+import lombok.Data;
+
+@Data
+public class DeleteDeviceFromUser {
+    private String deviceId;
 }

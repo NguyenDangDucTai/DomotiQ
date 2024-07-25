@@ -1,4 +1,4 @@
-package com.example.devicesservice.enums;
+package com.example.devicesservice.models.enums;
 
 public enum DeviceStatus {
     ACTIVE,

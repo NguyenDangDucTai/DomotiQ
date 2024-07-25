@@ -1,24 +1,23 @@
 package com.example.devicesservice.models;
 
-import com.example.devicesservice.enums.DeviceStatus;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter @Setter
 @Data
 @Document(collection = "userDevices")
-public class Device {
+public class UserDevice {
 
     @Id
-    private String id;
-    private String name;
+    private String deviceId;
+    private String deviceName;
     private String userId;
     private String type;
     private String location;
+
 
 }
