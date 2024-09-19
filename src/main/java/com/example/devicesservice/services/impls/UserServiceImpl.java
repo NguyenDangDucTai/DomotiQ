@@ -1,11 +1,10 @@
 package com.example.devicesservice.services.impls;
 
-import com.example.devicesservice.dtos.AddDeviceToUser;
-import com.example.devicesservice.dtos.DeleteDeviceFromUser;
-import com.example.devicesservice.dtos.FindDeviceByRoomName;
-import com.example.devicesservice.dtos.RenameDevice;
+import com.example.devicesservice.dtos.*;
 import com.example.devicesservice.models.DevicesOwend;
+import com.example.devicesservice.models.ModuleUsed;
 import com.example.devicesservice.models.User;
+import com.example.devicesservice.mqtt.MQTTClient;
 import com.example.devicesservice.repositories.DeviceRepository;
 import com.example.devicesservice.repositories.UserRepository;
 import com.example.devicesservice.services.UserServices;
@@ -149,5 +148,6 @@ public class UserServiceImpl implements UserServices {
             throw new RuntimeException(ex.getMessage());
         }
     }
+
 
 }
