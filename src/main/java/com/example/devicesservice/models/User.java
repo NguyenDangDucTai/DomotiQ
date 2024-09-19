@@ -1,6 +1,4 @@
 package com.example.devicesservice.models;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -8,18 +6,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@Data
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Document(collection = "users")
 public class User {
+
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private ObjectId id;
 
-    private List<DevicesOwend> devices;
+    private String username;
 
+    private String password;
+
+    private List<DevicesOwend> devices;
 
 }
