@@ -95,7 +95,9 @@ public class AssistantServiceImpl implements AssistantService {
                 .toList();
 
         if(modulesMax.size() > 1) {
-            return printError();
+            return AssistantResponse.builder()
+                    .message("Tôi phát hiện có nhiều thiết bị phù hợp. Tôi không thể xác định thiết bị bạn muốn điều khiển. Bạn có thể nói rõ hơn không?")
+                    .build();
         }
 
         ModuleUsed module = modulesMax.get(0);
