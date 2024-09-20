@@ -15,10 +15,13 @@ public class StringUtils {
         List<String> filteredS1 = Arrays.stream(s1.trim().toLowerCase().replaceAll("\\s+", " ").split(" "))
                 .filter(item -> !stopWords.contains(item))
                 .toList();
+        List<String> filteredS2 = Arrays.stream(s2.trim().toLowerCase().replaceAll("\\s+", " ").split(" "))
+                .filter(item -> !stopWords.contains(item))
+                .toList();
 
         String preProcessedS1 = String.join(" ", filteredS1);
         preProcessedS1 = removeAccent(preProcessedS1);
-        String preProcessedS2 = s2.toLowerCase().trim().replaceAll("\\s+", " ");
+        String preProcessedS2 = String.join(" ", filteredS2);
         preProcessedS2 = removeAccent(preProcessedS2);
 
         String[] splitS1 = preProcessedS1.split(" ");
@@ -32,6 +35,27 @@ public class StringUtils {
         }
 
         return (1.0 * count) / (preProcessedS1.length() - splitS1.length + 1);
+    }
+
+    public static double compareLength(String s1, String s2) {
+        List<String> filteredS1 = Arrays.stream(s1.trim().toLowerCase().replaceAll("\\s+", " ").split(" "))
+                .filter(item -> !stopWords.contains(item))
+                .toList();
+        List<String> filteredS2 = Arrays.stream(s2.trim().toLowerCase().replaceAll("\\s+", " ").split(" "))
+                .filter(item -> !stopWords.contains(item))
+                .toList();
+
+        String preProcessedS1 = String.join(" ", filteredS1);
+        preProcessedS1 = removeAccent(preProcessedS1);
+        String preProcessedS2 = String.join(" ", filteredS2);
+        preProcessedS2 = removeAccent(preProcessedS2);
+
+        String[] splitS1 = preProcessedS1.split(" ");
+        String[] splitS2 = preProcessedS2.split(" ");
+
+        if(splitS1.length > splitS2.length)
+            return 0;
+        return (1.0 * splitS1.length) / splitS2.length;
     }
 
     public static String removeAccent(String s) {

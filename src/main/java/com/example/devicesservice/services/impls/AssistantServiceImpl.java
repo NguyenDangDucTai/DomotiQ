@@ -34,7 +34,7 @@ public class AssistantServiceImpl implements AssistantService {
     @Value("${cloud.storage.credentials-file}")
     private String CREDENTIALS_FILE;
 
-    private final double ACCURACY = 0.7;
+    private final double ACCURACY = 0.6;
 
     private final MqttService mqttService;
 
@@ -47,7 +47,7 @@ public class AssistantServiceImpl implements AssistantService {
         MapUtils.printMap(commandParams);
 
         if (commandParams.isEmpty()) {
-            return printError();
+            return printError(ErrorType.INVALID_COMMAND);
         }
 
         String responseMessage = commandParams.get("responseMessage");
@@ -57,18 +57,18 @@ public class AssistantServiceImpl implements AssistantService {
 
         String actionCode;
         if(action == null) {
-            return printError();
+            return printError(ErrorType.INVALID_COMMAND);
         }
         if(action.equalsIgnoreCase("ON")) {
             actionCode = "1";
         } else if(action.equalsIgnoreCase("OFF")) {
             actionCode = "0";
         } else {
-            return printError();
+            return printError(ErrorType.INVALID_COMMAND);
         }
 
         if(device == null) {
-            return printError();
+            return printError(ErrorType.INVALID_DEVICE);
         }
 
         List<ModuleUsed> modules = user.getDevices().stream()
@@ -85,19 +85,39 @@ public class AssistantServiceImpl implements AssistantService {
         });
 
         if(compareResult.isEmpty()) {
-            return printError();
+            return printError(ErrorType.INVALID_DEVICE);
         }
 
         double maxSimilarity = compareResult.values().stream().max(Double::compare).orElse(0.0);
+        double finalMaxSimilarity1 = maxSimilarity;
         List<ModuleUsed> modulesMax = compareResult.entrySet().stream()
-                .filter(entry -> entry.getValue() == maxSimilarity)
+                .filter(entry -> entry.getValue() == finalMaxSimilarity1)
                 .map(Map.Entry::getKey)
                 .toList();
 
         if(modulesMax.size() > 1) {
-            return AssistantResponse.builder()
-                    .message("Tôi phát hiện có nhiều thiết bị phù hợp. Tôi không thể xác định thiết bị bạn muốn điều khiển. Bạn có thể nói rõ hơn không?")
-                    .build();
+            compareResult.clear();
+            modulesMax.forEach(module -> {
+                double similarity = StringUtils.compareLength(device, module.getDisplayNameModule());
+                if(similarity >= ACCURACY) {
+                    compareResult.put(module, similarity);
+                }
+            });
+
+            if(compareResult.isEmpty()) {
+                return printError(ErrorType.MULTIPLE_DEVICES);
+            }
+
+            maxSimilarity = compareResult.values().stream().max(Double::compare).orElse(0.0);
+            double finalMaxSimilarity2 = maxSimilarity;
+            modulesMax = compareResult.entrySet().stream()
+                    .filter(entry -> entry.getValue() == finalMaxSimilarity2)
+                    .map(Map.Entry::getKey)
+                    .toList();
+
+            if(modulesMax.size() > 1) {
+                return printError(ErrorType.MULTIPLE_DEVICES);
+            }
         }
 
         ModuleUsed module = modulesMax.get(0);
@@ -159,10 +179,24 @@ public class AssistantServiceImpl implements AssistantService {
         }
     }
 
-    private AssistantResponse printError() {
-        return AssistantResponse.builder()
-                .message(errorMessageList.get((int) (Math.random() * errorMessageList.size())))
-                .build();
+    private AssistantResponse printError(ErrorType type) {
+        switch (type) {
+            case INVALID_DEVICE -> {
+                return AssistantResponse.builder()
+                        .message("Tôi không tìm thấy thiết bị phù hợp. Bạn có thể nói rõ hơn không?")
+                        .build();
+            }
+            case MULTIPLE_DEVICES -> {
+                return AssistantResponse.builder()
+                        .message("Tôi phát hiện có nhiều thiết bị phù hợp. Tôi không thể xác định thiết bị bạn muốn điều khiển. Bạn có thể nói rõ hơn không?")
+                        .build();
+            }
+            default -> {
+                return AssistantResponse.builder()
+                        .message(errorMessageList.get((int) (Math.random() * errorMessageList.size())))
+                        .build();
+            }
+        }
     }
 
     private final List<String> errorMessageList = List.of(
@@ -171,5 +205,11 @@ public class AssistantServiceImpl implements AssistantService {
             "Tôi không hiểu bạn muốn gì. Bạn có thể nói rõ hơn không?",
             "Xin lỗi, tôi không hiểu bạn muốn gì. Bạn có thể nói rõ hơn không?"
     );
+
+    enum ErrorType {
+        INVALID_COMMAND,
+        INVALID_DEVICE,
+        MULTIPLE_DEVICES,
+    }
 
 }
