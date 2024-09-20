@@ -24,4 +24,13 @@ public class User {
 
     private List<DevicesOwend> devices;
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", devices=" + devices +
+                '}';
+    }
+
 }

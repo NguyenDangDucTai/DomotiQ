@@ -17,4 +17,15 @@ public class DevicesOwend {
     private String displayName;
     private String roomName;
     private List<ModuleUsed> modules;
+
+    @Override
+    public String toString() {
+        return "DevicesOwend{" +
+                "deviceId='" + deviceId + '\'' +
+                ", displayName='" + displayName + '\'' +
+                ", roomName='" + roomName + '\'' +
+                ", modules=" + modules +
+                '}';
+    }
+
 }

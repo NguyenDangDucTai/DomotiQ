@@ -1,17 +1,15 @@
 package com.example.devicesservice.services.impls;
 
-import com.example.devicesservice.dtos.*;
+import com.example.devicesservice.dtos.DeleteDeviceFromUser;
+import com.example.devicesservice.dtos.FindDeviceByRoomName;
+import com.example.devicesservice.dtos.RenameDevice;
 import com.example.devicesservice.models.DevicesOwend;
-import com.example.devicesservice.models.ModuleUsed;
 import com.example.devicesservice.models.User;
-import com.example.devicesservice.mqtt.MQTTClient;
 import com.example.devicesservice.repositories.DeviceRepository;
 import com.example.devicesservice.repositories.UserRepository;
 import com.example.devicesservice.services.UserServices;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -22,8 +20,6 @@ import java.util.Optional;
 @Component
 @AllArgsConstructor
 public class UserServiceImpl implements UserServices {
-
-
 
     private final UserRepository userRepository;
     private final DeviceRepository deviceRepository;
@@ -57,7 +53,6 @@ public class UserServiceImpl implements UserServices {
         } catch (Exception ex){
             throw new RuntimeException(ex.getMessage());
         }
-
     }
 
     @Override

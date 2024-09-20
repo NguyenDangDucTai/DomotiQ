@@ -15,4 +15,13 @@ public class ModuleUsed {
     private String displayNameModule;
     private boolean visible;
 
+    @Override
+    public String toString() {
+        return "ModuleUsed{" +
+                "id='" + id + '\'' +
+                ", displayNameModule='" + displayNameModule + '\'' +
+                ", visible=" + visible +
+                '}';
+    }
+
 }
