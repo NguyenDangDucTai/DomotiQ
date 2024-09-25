@@ -21,6 +21,7 @@ public abstract class RoomMapper {
     public abstract RoomResponse toRoomResponse(UserRoom userRoom);
 
     protected String mapId(ObjectId id) {
+        if(id == null) return null;
         return id.toHexString();
     }
 
