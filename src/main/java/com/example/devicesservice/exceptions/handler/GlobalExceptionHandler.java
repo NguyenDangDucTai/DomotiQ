@@ -3,12 +3,14 @@ package com.example.devicesservice.exceptions.handler;
 import com.example.devicesservice.dtos.ErrorResponse;
 import com.example.devicesservice.exceptions.BaseException;
 import com.example.devicesservice.mappers.ErrorMapper;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,9 +32,32 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         Map<String, Object> extra = new HashMap<>();
         e.getFieldErrors().forEach(violation -> extra.put(violation.getField(), violation.getDefaultMessage()));
+
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .code("400000")
+                .type("INVALID_REQUEST")
+                .message("Invalid request")
+                .extraError(extra)
+                .build();
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
+        Map<String, Object> extra = new HashMap<>();
+        extra.put("code", "400000");
+        extra.put("type", "INVALID_REQUEST");
+
+        e.getConstraintViolations().forEach(violation -> {
+            String field = violation.getPropertyPath().toString();
+            String message = violation.getMessage();
+            extra.put(field, message);
+        });
 
         ErrorResponse response = ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -67,6 +92,18 @@ public class GlobalExceptionHandler {
                 .code("404000")
                 .type("RESOURCE_NOT_FOUND")
                 .message("Resource not found")
+                .build();
+
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.METHOD_NOT_ALLOWED.value())
+                .code("405000")
+                .type("METHOD_NOT_ALLOWED")
+                .message("Method not allowed")
                 .build();
 
         return ResponseEntity.status(response.getStatus()).body(response);

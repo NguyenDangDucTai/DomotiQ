@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.ZonedDateTime;
+import java.util.Map;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class MqttMessage {
 
     private String topic;
-    private String message;
+    private Map<String, Object> payload;
+    private ZonedDateTime timestamp;
 
 }

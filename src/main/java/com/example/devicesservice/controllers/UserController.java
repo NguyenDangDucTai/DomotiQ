@@ -1,61 +1,25 @@
 package com.example.devicesservice.controllers;
 
 
-import com.example.devicesservice.dtos.*;
-import com.example.devicesservice.models.DevicesOwend;
-import com.example.devicesservice.services.UserServices;
+import com.example.devicesservice.dtos.user.UserResponse;
+import com.example.devicesservice.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserServices userServices;
+    private final UserService userService;
 
-    @GetMapping
-    public ResponseEntity<?> getAllUser(){
-        return ResponseEntity.ok(userServices.getAll());
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable String id){
+        return ResponseEntity.ok(userService.getUserById(id));
     }
-
-
-    @GetMapping("/{userId}/findById")
-    public ResponseEntity<?> findById(@PathVariable("userId") ObjectId id){
-        return ResponseEntity.ok(userServices.findById(id));
-    }
-
-    @PostMapping("/{userId}/addDevices")
-    public void addDeviceToUser(@PathVariable ObjectId userId,@RequestBody DevicesOwend request) {
-        userServices.addDeviceToUser(userId ,request);
-    }
-
-    @PostMapping("/{userId}/removeDevice")
-    public void removeDeviceFromUser(@PathVariable("userId") ObjectId userId, @RequestBody DeleteDeviceFromUser request){
-        userServices.deleteDevicefromUser(userId, request);
-    }
-
-    @GetMapping("/{userId}/findDeviceByRoomName")
-    public ResponseEntity<?> findDeviceByRoomName(@PathVariable("userId") ObjectId userId,@RequestBody FindDeviceByRoomName request) {
-        return ResponseEntity.ok(userServices.findDeviceByRoomName(userId, request));
-    }
-
-    @PostMapping("/{userId}/renameDevice")
-    public void renameDevices(@PathVariable("userId") ObjectId userId, @RequestBody RenameDevice request){
-        userServices.renameDevice(userId, request);
-    }
-
-
-
-    @GetMapping("/{userId}")
-    public ResponseEntity<?> getAllStateModules(@PathVariable("userId") ObjectId userId){
-
-        return null;
-    }
-
 
 }

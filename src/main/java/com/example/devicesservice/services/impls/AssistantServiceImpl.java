@@ -4,9 +4,10 @@ import com.example.devicesservice.contexts.AuthCertificate;
 import com.example.devicesservice.contexts.SecurityContext;
 import com.example.devicesservice.dtos.assistant.AssistantRequest;
 import com.example.devicesservice.dtos.assistant.AssistantResponse;
-import com.example.devicesservice.models.ModuleUsed;
 import com.example.devicesservice.models.MqttMessage;
 import com.example.devicesservice.models.User;
+import com.example.devicesservice.models.UserModule;
+import com.example.devicesservice.repositories.UserModuleRepository;
 import com.example.devicesservice.services.AssistantService;
 import com.example.devicesservice.services.MqttService;
 import com.example.devicesservice.utils.MapUtils;
@@ -14,6 +15,7 @@ import com.example.devicesservice.utils.StringUtils;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.dialogflow.v2.*;
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -37,6 +39,8 @@ public class AssistantServiceImpl implements AssistantService {
     private final double ACCURACY = 0.6;
 
     private final MqttService mqttService;
+
+    private final UserModuleRepository userModuleRepository;
 
     @Override
     public AssistantResponse process(AssistantRequest request) throws IOException {
@@ -71,14 +75,13 @@ public class AssistantServiceImpl implements AssistantService {
             return printError(ErrorType.INVALID_DEVICE);
         }
 
-        List<ModuleUsed> modules = user.getDevices().stream()
-                .flatMap(d -> d.getModules().stream()
-                        .peek(m -> m.setId(d.getDeviceId() + "::" + m.getId())))
+        List<UserModule> modules = userModuleRepository.findAllByUser(user).stream()
+                .peek(m -> m.setId(new ObjectId(String.format("%s::%s", m.getDevice().getId().toHexString(), m.getModule().getId().toHexString()))))
                 .toList();
 
-        Map<ModuleUsed, Double> compareResult = new HashMap<>();
+        Map<UserModule, Double> compareResult = new HashMap<>();
         modules.forEach(module -> {
-            double similarity = StringUtils.compareStrings(device, module.getDisplayNameModule());
+            double similarity = StringUtils.compareStrings(device, module.getDisplayName());
             if(similarity >= ACCURACY) {
                 compareResult.put(module, similarity);
             }
@@ -90,7 +93,7 @@ public class AssistantServiceImpl implements AssistantService {
 
         double maxSimilarity = compareResult.values().stream().max(Double::compare).orElse(0.0);
         double finalMaxSimilarity1 = maxSimilarity;
-        List<ModuleUsed> modulesMax = compareResult.entrySet().stream()
+        List<UserModule> modulesMax = compareResult.entrySet().stream()
                 .filter(entry -> entry.getValue() == finalMaxSimilarity1)
                 .map(Map.Entry::getKey)
                 .toList();
@@ -98,7 +101,7 @@ public class AssistantServiceImpl implements AssistantService {
         if(modulesMax.size() > 1) {
             compareResult.clear();
             modulesMax.forEach(module -> {
-                double similarity = StringUtils.compareLength(device, module.getDisplayNameModule());
+                double similarity = StringUtils.compareLength(device, module.getDisplayName());
                 if(similarity >= ACCURACY) {
                     compareResult.put(module, similarity);
                 }
@@ -120,19 +123,24 @@ public class AssistantServiceImpl implements AssistantService {
             }
         }
 
-        ModuleUsed module = modulesMax.get(0);
-        String deviceId = module.getId().split("::")[0];
+        UserModule module = modulesMax.get(0);
+        String deviceId = module.getId().toHexString().split("::")[0];
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("module", module.getId());
+        payload.put("cmd", "SET_STATE");
+        payload.put("state", actionCode);
 
         MqttMessage mqttMessage = MqttMessage.builder()
                 .topic(deviceId)
-                .message("{module:\"" + module.getId() + "\",cmd:\"SET_STATE\",state:" + actionCode + "}")
+                .payload(payload)
                 .build();
 
         mqttService.publish(mqttMessage);
 
         responseMessage = responseMessage
                 .replace("{action}", actionCode.equals("1") ? "Bật" : "Tắt")
-                .replace("{device}", module.getDisplayNameModule());
+                .replace("{device}", module.getDisplayName());
 
         return AssistantResponse.builder()
                 .message(responseMessage)

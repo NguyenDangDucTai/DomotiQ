@@ -1,34 +1,39 @@
 package com.example.devicesservice.models;
 
 
-import com.example.devicesservice.models.enums.DeviceStatus;
-//import jakarta.persistence.GeneratedValue;
-//import jakarta.persistence.GenerationType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@Data
+@SuperBuilder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Document(collection = "devices")
 public class Device {
 
     @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private ObjectId id;
 
-    private String productId;
+    private DeviceType type;
 
     private String name;
 
-    private List<ModuleDevice> module;
+    @Transient
+    private List<Module> modules;
+
+    public Device(ObjectId id) {
+        this.id = id;
+    }
 
 }

@@ -1,33 +1,41 @@
 package com.example.devicesservice.controllers;
 
-
-import com.example.devicesservice.dtos.AddNewDevice;
-import com.example.devicesservice.services.DeviceServices;
-import lombok.AllArgsConstructor;
-import org.bson.types.ObjectId;
+import com.example.devicesservice.dtos.device.*;
+import com.example.devicesservice.services.DeviceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/devices")
-@AllArgsConstructor
+@RequestMapping("/devices")
+@RequiredArgsConstructor
 public class DeviceController {
 
-    private final DeviceServices deviceServices;
+    private final DeviceService deviceService;
 
-    @GetMapping("/{deviceId}")
-    public ResponseEntity<?> getDeviceById(@PathVariable("deviceId") ObjectId id){
-        return ResponseEntity.ok(deviceServices.getById(id));
+    @GetMapping
+    public ResponseEntity<DeviceListResponse> getDeviceList(@ModelAttribute GetDeviceListRequest request) {
+        return ResponseEntity.ok(deviceService.getDeviceList(request));
     }
 
-    @PostMapping("/addNewDevice")
-    public void addNewDevice(@RequestBody AddNewDevice request){
-        deviceServices.addDevice(request);
+    @GetMapping("/{id}")
+    public ResponseEntity<DeviceResponse> getDeviceById(@PathVariable String id) {
+        return ResponseEntity.ok(deviceService.getDeviceById(new GetDeviceByIdRequest(id)));
     }
 
+    @PostMapping
+    public ResponseEntity<DeviceResponse> createDevice(@RequestBody CreateDeviceRequest request) {
+        return ResponseEntity.ok(deviceService.createDevice(request));
+    }
 
+    @PutMapping
+    public ResponseEntity<DeviceResponse> updateDevice(@RequestBody UpdateDeviceRequest request) {
+        return ResponseEntity.ok(deviceService.updateDevice(request));
+    }
 
-
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteDevice(@PathVariable String id) {
+        return ResponseEntity.ok(deviceService.deleteDevice(new DeleteDeviceRequest(id)));
+    }
 
 }
