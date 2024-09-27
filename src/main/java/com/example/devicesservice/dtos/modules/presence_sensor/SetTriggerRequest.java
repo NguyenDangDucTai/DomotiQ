@@ -1,13 +1,14 @@
 package com.example.devicesservice.dtos.modules.presence_sensor;
 
-import com.example.devicesservice.models.PresenceSensorModuleTrigger;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class SetTriggerRequest {
 
     private String moduleId;
-    private PresenceSensorModuleTrigger triggerOnDetectPresence;
-    private PresenceSensorModuleTrigger triggerOnDetectAbsence;
+    private List<PresenceSensorTriggerRequest> triggerOnDetectPresence;
+    private List<PresenceSensorTriggerRequest> triggerOnDetectAbsence;
 
 }
