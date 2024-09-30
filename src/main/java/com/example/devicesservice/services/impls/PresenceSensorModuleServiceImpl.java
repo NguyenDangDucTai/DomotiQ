@@ -22,6 +22,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ public class PresenceSensorModuleServiceImpl implements PresenceSensorModuleServ
 
     private final ModuleService moduleService;
     private final MqttService mqttService;
+    private final NotificationService notificationService;
 
     private final PresenceSensorDataLogMapper presenceSensorDataLogMapper;
 
@@ -74,29 +76,34 @@ public class PresenceSensorModuleServiceImpl implements PresenceSensorModuleServ
 
         if (state == 1) {
             List<PresenceSensorModuleTrigger> triggerOnDetectPresence = module.getTriggerOnDetectPresence();
-            executeTriggers(triggerOnDetectPresence);
+            executeTriggers(state, triggerOnDetectPresence);
         } else if(state == 0) {
             List<PresenceSensorModuleTrigger> triggerOnDetectAbsence = module.getTriggerOnDetectAbsence();
-            executeTriggers(triggerOnDetectAbsence);
+            executeTriggers(state, triggerOnDetectAbsence);
         }
     }
 
-    private void executeTriggers(List<PresenceSensorModuleTrigger> triggers) {
+    private void executeTriggers(Integer state, List<PresenceSensorModuleTrigger> triggers) {
         if(triggers != null && !triggers.isEmpty()) {
             triggers.forEach(trigger -> {
                 if(trigger.getType() == PresenceSensorModuleTrigger.Type.DEVICE_CONTROL) {
-                    executeDeviceControlAction(trigger);
+                    executeDeviceControlAction(state, trigger);
                 } else if(trigger.getType() == PresenceSensorModuleTrigger.Type.NOTIFICATION) {
-                     executeNotificationAction(trigger);
+                     executeNotificationAction(state, trigger);
                 }
             });
         }
     }
 
-    private void executeNotificationAction(PresenceSensorModuleTrigger trigger) {
+    private void executeNotificationAction(Integer state, PresenceSensorModuleTrigger trigger) {
+        SendMessage message = SendMessage.builder()
+                .chatId("6142006691")
+                .text("Presence detected: " + state)
+                .build();
+        notificationService.sendMessage(message);
     }
 
-    private void executeDeviceControlAction(PresenceSensorModuleTrigger trigger) {
+    private void executeDeviceControlAction(Integer state, PresenceSensorModuleTrigger trigger) {
         Module module = trigger.getModule();
         String commandKey = trigger.getCommand();
         if(module.getCommands() == null) return;
