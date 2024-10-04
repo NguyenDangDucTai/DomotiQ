@@ -4,6 +4,7 @@ package com.example.devicesservice.models;
 import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -18,6 +19,9 @@ public class UserModule {
     @Id
     @EqualsAndHashCode.Include
     private ObjectId id;
+
+    @Transient
+    private String _id;
 
     @DBRef(lazy = true)
     private User user;
@@ -35,5 +39,6 @@ public class UserModule {
     private String displayName;
 
     private UserModuleStatus status;
+    private ModuleType type;
 
 }

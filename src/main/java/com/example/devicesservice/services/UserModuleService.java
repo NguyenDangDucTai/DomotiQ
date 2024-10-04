@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public interface UserModuleService {
 
-    UserModuleListResponse getModuleListByUser(@Valid GetModuleListByUserRequest request);
+    UserModuleListResponse getModuleListByUser();
     UserModuleResponse getModuleFromUserById(@Valid GetModuleFromUserByIdRequest request);
     UserModuleResponse updateModuleFromUser(@Valid UpdateModuleFromUserRequest request);
 

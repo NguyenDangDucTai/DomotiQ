@@ -14,8 +14,8 @@ public class UserModuleController {
     private final UserModuleService userModuleService;
 
     @GetMapping
-    public ResponseEntity<UserModuleListResponse> getModuleListByUser(@RequestBody GetModuleListByUserRequest request) {
-        return ResponseEntity.ok(userModuleService.getModuleListByUser(request));
+    public ResponseEntity<UserModuleListResponse> getModuleListByUser() {
+        return ResponseEntity.ok(userModuleService.getModuleListByUser());
     }
 
     @GetMapping("/{moduleId}")

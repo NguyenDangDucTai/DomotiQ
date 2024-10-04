@@ -32,7 +32,8 @@ public class UserModuleServiceImpl implements UserModuleService {
     private final UserModuleMapper userModuleMapper;
 
     @Override
-    public UserModuleListResponse getModuleListByUser(GetModuleListByUserRequest request) {
+    public UserModuleListResponse getModuleListByUser() {
+        GetModuleListByUserRequest request = new GetModuleListByUserRequest();
         AuthCertificate certificate = SecurityContext.getAuthenticationCertificate();
         User user = certificate.getUser();
 

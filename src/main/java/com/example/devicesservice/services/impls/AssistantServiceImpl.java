@@ -53,34 +53,41 @@ public class AssistantServiceImpl implements AssistantService {
         if (commandParams.isEmpty()) {
             return printError(ErrorType.INVALID_COMMAND);
         }
+        System.out.println("1");
 
         String responseMessage = commandParams.get("responseMessage");
         String action = commandParams.get("action");
         String device = commandParams.get("device");
         String room = commandParams.get("room");
 
-        String actionCode;
+        System.out.println("2");
+        int actionCode;
         if(action == null) {
             return printError(ErrorType.INVALID_COMMAND);
-        }
+        } System.out.println("3");
         if(action.equalsIgnoreCase("ON")) {
-            actionCode = "1";
+            actionCode = 1;
         } else if(action.equalsIgnoreCase("OFF")) {
-            actionCode = "0";
+            actionCode = 0;
         } else {
             return printError(ErrorType.INVALID_COMMAND);
         }
+
+        System.out.println("4");
 
         if(device == null) {
             return printError(ErrorType.INVALID_DEVICE);
         }
 
         List<UserModule> modules = userModuleRepository.findAllByUser(user).stream()
-                .peek(m -> m.setId(new ObjectId(String.format("%s::%s", m.getDevice().getId().toHexString(), m.getModule().getId().toHexString()))))
+                .peek(m -> m.set_id(String.format("%s::%s", m.getDevice().getId().toHexString(), m.getModule().getId().toHexString())))
                 .toList();
+        System.out.println("lits module" + modules.size());
 
         Map<UserModule, Double> compareResult = new HashMap<>();
         modules.forEach(module -> {
+            System.out.println(device);
+            System.out.println("module: " + module.getDisplayName());
             double similarity = StringUtils.compareStrings(device, module.getDisplayName());
             if(similarity >= ACCURACY) {
                 compareResult.put(module, similarity);
@@ -124,10 +131,10 @@ public class AssistantServiceImpl implements AssistantService {
         }
 
         UserModule module = modulesMax.get(0);
-        String deviceId = module.getId().toHexString().split("::")[0];
+        String deviceId = module.get_id().split("::")[0];
 
         Map<String, Object> payload = new HashMap<>();
-        payload.put("module", module.getId());
+        payload.put("module", module.getModule().getId().toHexString());
         payload.put("cmd", "SET_STATE");
         payload.put("state", actionCode);
 
@@ -139,7 +146,7 @@ public class AssistantServiceImpl implements AssistantService {
         mqttService.publish(mqttMessage);
 
         responseMessage = responseMessage
-                .replace("{action}", actionCode.equals("1") ? "Bật" : "Tắt")
+                .replace("{action}", actionCode == 1 ? "Bật" : "Tắt")
                 .replace("{device}", module.getDisplayName());
 
         return AssistantResponse.builder()
