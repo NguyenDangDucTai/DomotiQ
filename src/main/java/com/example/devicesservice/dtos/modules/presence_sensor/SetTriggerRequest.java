@@ -1,13 +1,17 @@
 package com.example.devicesservice.dtos.modules.presence_sensor;
 
-import com.example.devicesservice.models.PresenceSensorModuleTrigger;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class SetTriggerRequest {
 
+    @NotBlank(message = "moduleId is must be not null or empty")
     private String moduleId;
-    private PresenceSensorModuleTrigger triggerOnDetectPresence;
-    private PresenceSensorModuleTrigger triggerOnDetectAbsence;
+
+    private List<PresenceSensorTriggerRequest> triggerOnDetectPresence;
+    private List<PresenceSensorTriggerRequest> triggerOnDetectAbsence;
 
 }

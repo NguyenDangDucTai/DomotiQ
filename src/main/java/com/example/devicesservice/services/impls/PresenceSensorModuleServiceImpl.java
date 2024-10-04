@@ -4,7 +4,9 @@ import com.example.devicesservice.dtos.GetListRequest;
 import com.example.devicesservice.dtos.Metadata;
 import com.example.devicesservice.dtos.module_log.GetLogListRequest;
 import com.example.devicesservice.dtos.module_log.PresenceSensorDataLogListResponse;
+import com.example.devicesservice.dtos.modules.presence_sensor.PresenceSensorTriggerRequest;
 import com.example.devicesservice.dtos.modules.presence_sensor.SetTriggerRequest;
+import com.example.devicesservice.exceptions.ValidationException;
 import com.example.devicesservice.factories.QueryFactory;
 import com.example.devicesservice.mappers.PresenceSensorDataLogMapper;
 import com.example.devicesservice.models.Module;
@@ -20,10 +22,10 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -36,6 +38,7 @@ public class PresenceSensorModuleServiceImpl implements PresenceSensorModuleServ
 
     private final ModuleService moduleService;
     private final MqttService mqttService;
+    private final NotificationService notificationService;
 
     private final PresenceSensorDataLogMapper presenceSensorDataLogMapper;
 
@@ -62,64 +65,101 @@ public class PresenceSensorModuleServiceImpl implements PresenceSensorModuleServ
                 .build();
 
         moduleLogRepository.save(log);
-
-        System.out.println(log.getId().toHexString());
     }
 
     private void handleTrigger(MqttMessage message) {
-//        Map<String, Object> payload = message.getPayload();
-//        String moduleId = (String) payload.get("moduleId");
-//        Integer state = (Integer) payload.get("state");
-//
-//        PresenceSensorModule module = findModuleById(moduleId);
-//
-//        if (state == 1) {
-//            PresenceSensorModuleTrigger triggerOnDetectPresence = module.getTriggerOnDetectPresence();
-//            if(triggerOnDetectPresence != null) {
-//                Set<PresenceSensorModuleTrigger.Action> actions = triggerOnDetectPresence.getActions();
-//                executeActions(actions);
-//            }
-//        } else if(state == 0) {
-//            PresenceSensorModuleTrigger triggerOnDetectAbsence = module.getTriggerOnDetectAbsence();
-//            if(triggerOnDetectAbsence != null) {
-//                Set<PresenceSensorModuleTrigger.Action> actions = triggerOnDetectAbsence.getActions();
-//                executeActions(actions);
-//            }
-//        }
+        Map<String, Object> payload = message.getPayload();
+        String moduleId = (String) payload.get("module");
+        Integer state = (Integer) payload.get("state");
+
+        PresenceSensorModule module = (PresenceSensorModule) moduleService.findModuleById(moduleId, ModuleType.PRESENCE_SENSOR);
+
+        if (state == 1) {
+            List<PresenceSensorModuleTrigger> triggerOnDetectPresence = module.getTriggerOnDetectPresence();
+            executeTriggers(state, triggerOnDetectPresence);
+        } else if(state == 0) {
+            List<PresenceSensorModuleTrigger> triggerOnDetectAbsence = module.getTriggerOnDetectAbsence();
+            executeTriggers(state, triggerOnDetectAbsence);
+        }
     }
 
-    private void executeActions(Set<PresenceSensorModuleTrigger.Action> actions) {
-        if(actions != null && !actions.isEmpty()) {
-            actions.forEach(action -> {
-                if(action.getType().equals(PresenceSensorModuleTrigger.Action.Type.DEVICE_CONTROL)) {
-                    executeDeviceControlAction(action);
-                } else if(action.getType().equals(PresenceSensorModuleTrigger.Action.Type.NOTIFICATION)) {
-                     executeNotificationAction(action);
+    private void executeTriggers(Integer state, List<PresenceSensorModuleTrigger> triggers) {
+        if(triggers != null && !triggers.isEmpty()) {
+            triggers.forEach(trigger -> {
+                if(trigger.getType() == PresenceSensorModuleTrigger.Type.DEVICE_CONTROL) {
+                    executeDeviceControlAction(state, trigger);
+                } else if(trigger.getType() == PresenceSensorModuleTrigger.Type.NOTIFICATION) {
+                     executeNotificationAction(state, trigger);
                 }
             });
         }
     }
 
-    private void executeNotificationAction(PresenceSensorModuleTrigger.Action action) {
+    private void executeNotificationAction(Integer state, PresenceSensorModuleTrigger trigger) {
+        SendMessage message = SendMessage.builder()
+                .chatId("6142006691")
+                .text("Presence detected: " + state)
+                .build();
+        notificationService.sendMessage(message);
     }
 
-    private void executeDeviceControlAction(PresenceSensorModuleTrigger.Action action) {
-        PresenceSensorModuleTrigger.DeviceControlAction deviceControlAction = (PresenceSensorModuleTrigger.DeviceControlAction) action;
-        Command command = deviceControlAction.getCommand();
+    private void executeDeviceControlAction(Integer state, PresenceSensorModuleTrigger trigger) {
+        Module module = trigger.getModule();
+        String commandKey = trigger.getCommand();
+        if(module.getCommands() == null) return;
+        Command command = module.getCommands().get(commandKey);
+        if(command == null) return;
         MqttMessage msg = command.toMqttMessage();
+        msg.getPayload().put("module", module.getId().toHexString());
         mqttService.publish(msg);
     }
 
     @Override
     public PresenceSensorModule setTrigger(SetTriggerRequest request) {
-        PresenceSensorModule module = findModuleById(request.getModuleId());
+        PresenceSensorModule module = (PresenceSensorModule) moduleService.findModuleById(request.getModuleId(), ModuleType.PRESENCE_SENSOR);
 
-        module.setTriggerOnDetectPresence(request.getTriggerOnDetectPresence());
-        module.setTriggerOnDetectAbsence(request.getTriggerOnDetectAbsence());
+        List<PresenceSensorModuleTrigger> triggerOnDetectPresence = request.getTriggerOnDetectPresence().stream()
+                .map(this::mapPresenceSensorModuleTrigger)
+                .toList();
+
+        List<PresenceSensorModuleTrigger> triggerOnDetectAbsence = request.getTriggerOnDetectAbsence().stream()
+                .map(this::mapPresenceSensorModuleTrigger)
+                .toList();
+
+        module.setTriggerOnDetectPresence(triggerOnDetectPresence);
+        module.setTriggerOnDetectAbsence(triggerOnDetectAbsence);
 
         presenceSensorModuleRepository.save(module);
 
         return module;
+    }
+
+    private PresenceSensorModuleTrigger mapPresenceSensorModuleTrigger(PresenceSensorTriggerRequest request) {
+        PresenceSensorModuleTrigger.Type triggerType = PresenceSensorModuleTrigger.Type.valueOf(request.getType());
+        PresenceSensorModuleTrigger newTrigger = PresenceSensorModuleTrigger.builder()
+                .type(triggerType)
+                .build();
+
+        if(triggerType == PresenceSensorModuleTrigger.Type.DEVICE_CONTROL) {
+            if(request.getModuleId() == null)
+                throw new ValidationException(Map.of("moduleId", "Module id is required"));
+            Module m = moduleService.findModuleById(request.getModuleId());
+            newTrigger.setModule(m);
+
+            if(request.getCommand() == null)
+                throw new ValidationException(Map.of("command", "Command is required"));
+            if(m.getCommands() == null)
+                throw new ValidationException(Map.of("command", "Command is not valid"));
+            if(m.getCommands().get(request.getCommand()) == null)
+                throw new ValidationException(Map.of("command", "Command is not valid"));
+            newTrigger.setCommand(request.getCommand());
+        } else if(triggerType == PresenceSensorModuleTrigger.Type.NOTIFICATION) {
+            if(request.getPhone() == null)
+                throw new ValidationException(Map.of("phone", "Phone is required"));
+            newTrigger.setPhone(request.getPhone());
+        }
+
+        return newTrigger;
     }
 
     @Override
@@ -149,11 +189,6 @@ public class PresenceSensorModuleServiceImpl implements PresenceSensorModuleServ
                 .metadata(Metadata.builder().total(total).build())
                 .items(logs.stream().map(presenceSensorDataLogMapper::toPresenceSensorDataLogResponse).toList())
                 .build();
-    }
-
-    private PresenceSensorModule findModuleById(String moduleId) {
-        return presenceSensorModuleRepository.findById(new ObjectId(moduleId))
-                .orElseThrow(() -> new RuntimeException(String.format("Module with id %s not found", moduleId)));
     }
 
 }

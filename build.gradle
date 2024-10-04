@@ -40,7 +40,7 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.6.0'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.0'
     implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
-
+    implementation 'org.telegram:telegrambots:6.9.7.1'
 
 
 

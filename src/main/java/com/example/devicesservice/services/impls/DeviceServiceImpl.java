@@ -65,6 +65,7 @@ public class DeviceServiceImpl implements DeviceService {
                         m.getCommands().forEach(cmd -> {
                             Command command = Command.builder()
                                     .name(cmd.getName())
+                                    .device(device)
                                     .params(cmd.getParams())
                                     .build();
                             commands.put(command.getName(), command);
@@ -105,6 +106,7 @@ public class DeviceServiceImpl implements DeviceService {
                             Command command = Command.builder()
                                     .id(cmd.getId() == null ? null : new ObjectId(cmd.getId()))
                                     .name(cmd.getName())
+                                    .device(device)
                                     .params(cmd.getParams())
                                     .build();
                             commands.put(command.getName(), command);

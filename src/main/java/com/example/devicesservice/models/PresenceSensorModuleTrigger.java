@@ -4,9 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-
-import java.util.Set;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 @Data
 @NoArgsConstructor
@@ -15,36 +13,16 @@ import java.util.Set;
 public class PresenceSensorModuleTrigger {
 
     private Type type;
-    private Set<Action> actions;
+
+    @DBRef(lazy = true)
+    private Module module;
+    private String command;
+
+    private String phone;
 
     public enum Type {
-        ON_DETECT_PRESENCE,
-        ON_DETECT_ABSENCE
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @SuperBuilder
-    public static class Action {
-
-        private Type type;
-
-        public enum Type {
-            DEVICE_CONTROL,
-            NOTIFICATION
-        }
-
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @SuperBuilder
-    public static class DeviceControlAction extends Action {
-
-        private Command command;
-
+        DEVICE_CONTROL,
+        NOTIFICATION
     }
 
 }
