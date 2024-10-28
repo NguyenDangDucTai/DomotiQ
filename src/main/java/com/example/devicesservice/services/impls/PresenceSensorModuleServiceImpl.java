@@ -71,9 +71,11 @@ public class PresenceSensorModuleServiceImpl implements PresenceSensorModuleServ
         Map<String, Object> payload = message.getPayload();
         String moduleId = (String) payload.get("module");
         Integer state = (Integer) payload.get("state");
+        System.out.println("state trigger: " + state);
 
         PresenceSensorModule module = (PresenceSensorModule) moduleService.findModuleById(moduleId, ModuleType.PRESENCE_SENSOR);
-
+        System.out.println("module presence: " + module.getId());
+        System.out.println("module Id: " +moduleId);
         if (state == 1) {
             List<PresenceSensorModuleTrigger> triggerOnDetectPresence = module.getTriggerOnDetectPresence();
             executeTriggers(state, triggerOnDetectPresence);
@@ -101,6 +103,12 @@ public class PresenceSensorModuleServiceImpl implements PresenceSensorModuleServ
                 .text("Presence detected: " + state)
                 .build();
         notificationService.sendMessage(message);
+
+        SendMessage messageSecond = SendMessage.builder()
+                .chatId("7766710312")
+                .text("Presence detected: " + state)
+                .build();
+        notificationService.sendMessage(messageSecond);
     }
 
     private void executeDeviceControlAction(Integer state, PresenceSensorModuleTrigger trigger) {
