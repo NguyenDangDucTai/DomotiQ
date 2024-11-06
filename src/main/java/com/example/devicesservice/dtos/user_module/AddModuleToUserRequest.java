@@ -22,4 +22,11 @@ public class AddModuleToUserRequest {
     @EnumValidator(enumClass = UserModuleStatus.class, message = "status must be one of these values: [VISIBLE, HIDDEN]", required = true)
     private String status;
 
+    @NotBlank(message = "roomId must be not null or empty")
+    @Length(min = 24, max = 24, message = "roomId must be 24 characters long")
+    @EqualsAndHashCode.Include
+    private String roomId;
+
+
+
 }
