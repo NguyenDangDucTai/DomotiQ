@@ -27,6 +27,7 @@ public class UserDevice {
     @DBRef(lazy = true)
     private Device device;
 
+
     @Transient
     private List<UserModule> modules;
 

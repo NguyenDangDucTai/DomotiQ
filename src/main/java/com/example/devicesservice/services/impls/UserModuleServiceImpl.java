@@ -63,6 +63,8 @@ public class UserModuleServiceImpl implements UserModuleService {
         UserModule userModule = userModuleRepository.findByUserAndModule(user, new Module(new ObjectId(request.getModuleId())))
                 .orElseThrow(() -> new NotFoundException(String.format("module with moduleId %s not found", request.getModuleId())));
 
+        System.out.println("444444444: " + userModule.getModule().toString());
+
         return userModuleMapper.toUserModuleResponse(userModule);
     }
 

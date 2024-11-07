@@ -13,6 +13,7 @@ import com.example.devicesservice.repositories.UserDeviceRepository;
 import com.example.devicesservice.repositories.UserModuleRepository;
 import com.example.devicesservice.services.DeviceService;
 import com.example.devicesservice.services.UserDeviceService;
+import com.example.devicesservice.services.UserRoomService;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,7 @@ public class UserDeviceServiceImpl implements UserDeviceService {
     private final DeviceService deviceService;
 
     private final UserDeviceMapper userDeviceMapper;
+    private final UserRoomService userRoomService;
 
     @Override
     public UserDeviceListResponse getDeviceListByUser(GetDeviceListByUserRequest request) {
@@ -74,12 +76,17 @@ public class UserDeviceServiceImpl implements UserDeviceService {
                             .filter(m -> m.getModuleId().equals(module.getId().toHexString()))
                             .findFirst()
                             .orElseThrow(() -> new NotFoundException(String.format("Module with id %s not found", module.getId())));
-
+                    UserRoom userRoom = null;
+                    if(addModuleRequest.getRoomId() != null) {
+                        userRoom = userRoomService.findRoomById(addModuleRequest.getRoomId());
+                    }
                     return UserModule.builder()
                             .user(user)
                             .device(device)
                             .module(module)
                             .displayName(addModuleRequest.getDisplayName())
+                            .room(userRoom)
+                            .roomId(addModuleRequest.getRoomId())
                             .status(UserModuleStatus.valueOf(addModuleRequest.getStatus()))
                             .build();
                 })

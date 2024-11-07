@@ -1,10 +1,12 @@
 package com.example.devicesservice.repositories;
 
+import com.example.devicesservice.dtos.modules.ModuleResponse;
 import com.example.devicesservice.models.Device;
 import com.example.devicesservice.models.Module;
 import com.example.devicesservice.models.ModuleType;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
