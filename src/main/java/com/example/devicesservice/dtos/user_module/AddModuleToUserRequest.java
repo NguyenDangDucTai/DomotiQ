@@ -1,5 +1,6 @@
 package com.example.devicesservice.dtos.user_module;
 
+import com.example.devicesservice.models.ModuleType;
 import com.example.devicesservice.models.UserModuleStatus;
 import com.example.devicesservice.utils.validators.EnumValidator;
 import jakarta.validation.constraints.NotBlank;
@@ -26,6 +27,10 @@ public class AddModuleToUserRequest {
     @Length(min = 24, max = 24, message = "roomId must be 24 characters long")
     @EqualsAndHashCode.Include
     private String roomId;
+
+
+    @EnumValidator(enumClass = ModuleType.class, message = "status must be one of these values: [SOCKET, WEATHER_SENSOR, PRESENCE_SENSOR]", required = true)
+    private String type;
 
 
 
