@@ -87,6 +87,7 @@ public class UserDeviceServiceImpl implements UserDeviceService {
                             .displayName(addModuleRequest.getDisplayName())
                             .room(userRoom)
                             .roomId(addModuleRequest.getRoomId())
+                            .type(ModuleType.valueOf(addModuleRequest.getType()))
                             .status(UserModuleStatus.valueOf(addModuleRequest.getStatus()))
                             .build();
                 })
