@@ -1,8 +1,10 @@
 package com.example.devicesservice.controllers;
 
 
+import com.example.devicesservice.dtos.modules.ModulePresenceByIdResponse;
 import com.example.devicesservice.dtos.modules.ModuleResponse;
 import com.example.devicesservice.models.Module;
+import com.example.devicesservice.models.ModuleType;
 import com.example.devicesservice.services.ModuleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +21,8 @@ public class ModuleController {
     private final ModuleService moduleService;
 
     @GetMapping("/{moduleId}")
-    public ResponseEntity<Module> getModuleById(@PathVariable String moduleId){
-        System.out.println("555555555555" + moduleId);
-        Module module = moduleService.findModuleById(moduleId);
-        System.out.println("4444444: " + module);
-        return ResponseEntity.ok(module);
+    public ResponseEntity<ModulePresenceByIdResponse> getModulePresenceById(@PathVariable String moduleId){
+        return ResponseEntity.ok(moduleService.findModulePresenceById(moduleId));
     }
 
 
