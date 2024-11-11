@@ -1,15 +1,13 @@
 package com.example.devicesservice.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter @Setter
 public class PresenceSensorModuleTrigger {
 
     private Type type;

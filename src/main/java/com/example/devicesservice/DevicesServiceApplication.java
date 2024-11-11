@@ -13,9 +13,6 @@ public class DevicesServiceApplication {
     public static void main(String[] args) {
 
         SpringApplication.run(DevicesServiceApplication.class, args);
-//        MQTTClient.connect();
-//        MQTTClient.subscribeTopic();
-//        MQTTClient.callback();
 
     }
 

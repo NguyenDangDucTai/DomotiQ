@@ -19,4 +19,7 @@ public interface ModuleRepository extends MongoRepository<Module, ObjectId> {
     Optional<Module> findByIdAndType(ObjectId id, ModuleType type);
     void deleteAllByDevice(Device device);
 
+    @Query("{ '_id' : ?0}")
+    ModuleResponse findModulePresenceById(ObjectId moduleId);
+
 }
