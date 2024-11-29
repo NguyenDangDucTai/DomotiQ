@@ -9,6 +9,7 @@ public class GestureCameraModuleTriggerResponse {
     private String type;
 
     private String moduleId;
+    private String deviceId;
 
     private String command;
 

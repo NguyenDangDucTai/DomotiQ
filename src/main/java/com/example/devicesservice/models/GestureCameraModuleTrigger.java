@@ -15,6 +15,7 @@ public class GestureCameraModuleTrigger {
     @DBRef(lazy = true)
     private Module module;
     private String command;
+    private Device device;
 
 
 

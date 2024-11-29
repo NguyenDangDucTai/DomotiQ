@@ -83,6 +83,7 @@ public class ModuleServiceImpl implements ModuleService {
                                 .moduleId(moduleId)
                                 .type(m.getType().toString())
                                 .command(m.getCommand())
+                                .deviceId(String.valueOf(m.getDevice().getId()))
                                 .build();
                         return gestureCameraModuleTriggerResponse;
                     }).toList();

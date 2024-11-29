@@ -34,7 +34,6 @@ public class GestureCameraModuleServiceImpl implements GestureCameraModuleServic
                 .map(this::mapGestureCameraModuleTrigger)
                 .toList();
 
-
         module.setGestureCameraModuleTriggers(gestureCameraModuleTriggers);
         gestureCameraModuleRepository.save(module);
 
@@ -51,6 +50,7 @@ public class GestureCameraModuleServiceImpl implements GestureCameraModuleServic
             throw new ValidationException(Map.of("moduleId", "Module id is required"));
         Module m = moduleService.findModuleById(request.getModuleId());
         newTrigger.setModule(m);
+        newTrigger.setDevice(m.getDevice());
         if(request.getCommand() == null)
             throw new ValidationException(Map.of("command", "Command is required"));
         if(m.getCommands() == null)
