@@ -4,11 +4,8 @@ import com.example.devicesservice.dtos.device.*;
 import com.example.devicesservice.exceptions.NotFoundException;
 import com.example.devicesservice.factories.ModuleFactory;
 import com.example.devicesservice.mappers.DeviceMapper;
-import com.example.devicesservice.models.Device;
-import com.example.devicesservice.models.DeviceType;
-import com.example.devicesservice.models.Command;
+import com.example.devicesservice.models.*;
 import com.example.devicesservice.models.Module;
-import com.example.devicesservice.models.ModuleType;
 import com.example.devicesservice.repositories.DeviceRepository;
 import com.example.devicesservice.repositories.ModuleRepository;
 import com.example.devicesservice.services.DeviceService;
@@ -20,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -73,6 +71,7 @@ public class DeviceServiceImpl implements DeviceService {
                         module.setCommands(commands);
                     }
 
+
                     return module;
                 })
                 .toList();
@@ -118,6 +117,8 @@ public class DeviceServiceImpl implements DeviceService {
                 })
                 .toList();
         device.setModules(modules);
+
+
 
         deviceRepository.save(device);
         moduleRepository.deleteAllByDevice(device);

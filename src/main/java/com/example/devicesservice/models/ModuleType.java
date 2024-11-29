@@ -4,6 +4,7 @@ public enum ModuleType {
 
     SOCKET,
     WEATHER_SENSOR,
-    PRESENCE_SENSOR
+    PRESENCE_SENSOR,
+    GESTURE_CAMERA,
 
 }

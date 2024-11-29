@@ -1,6 +1,7 @@
 package com.example.devicesservice.dtos.modules;
 
 import com.example.devicesservice.dtos.command.CommandRequest;
+import com.example.devicesservice.dtos.modules.gesture_camera.GestureCameraModuleTriggerRequest;
 import com.example.devicesservice.models.ModuleType;
 import com.example.devicesservice.utils.validators.EnumValidator;
 import jakarta.validation.constraints.NotBlank;
@@ -22,5 +23,7 @@ public class ModuleRequest {
     private String name;
 
     private List<CommandRequest> commands;
+
+    private List<GestureCameraModuleTriggerRequest> gestureCameraModuleTriggers;
 
 }

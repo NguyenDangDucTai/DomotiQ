@@ -32,8 +32,6 @@ public class Module {
 
     protected Map<String, Command> commands;
 
-//    protected List<PresenceSensorModuleTrigger> triggerOnDetectPresence;
-//    protected List<PresenceSensorModuleTrigger> triggerOnDetectAbsence;
 
     public Module(ObjectId id) {
         this.id = id;
