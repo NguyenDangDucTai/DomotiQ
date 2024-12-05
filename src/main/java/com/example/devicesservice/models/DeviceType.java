@@ -4,5 +4,8 @@ public enum DeviceType {
 
     SMART_BOX,
     PRESENCE_SENSOR,
+    GESTURE_CAMERA,
+
+
 
 }

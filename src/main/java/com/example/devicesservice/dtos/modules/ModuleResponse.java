@@ -2,6 +2,8 @@ package com.example.devicesservice.dtos.modules;
 
 import com.example.devicesservice.dtos.command.CommandResponse;
 import com.example.devicesservice.dtos.modules.presence_sensor.PresenceSensorModuleTriggerResponse;
+import com.example.devicesservice.models.Device;
+import com.example.devicesservice.models.GestureCameraModuleTrigger;
 import com.example.devicesservice.models.ModuleType;
 import com.example.devicesservice.models.PresenceSensorModuleTrigger;
 import lombok.*;
@@ -24,5 +26,6 @@ public class ModuleResponse {
 
     private List<PresenceSensorModuleTrigger> triggerOnDetectPresence;
     private List<PresenceSensorModuleTrigger> triggerOnDetectAbsence;
+    private List<GestureCameraModuleTrigger> gestureCameraModuleTriggers;
 
 }

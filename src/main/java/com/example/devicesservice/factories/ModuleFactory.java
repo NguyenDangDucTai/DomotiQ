@@ -10,8 +10,10 @@ public class ModuleFactory {
             case SOCKET -> createSocketModule();
             case WEATHER_SENSOR -> createWeatherSensorModule();
             case PRESENCE_SENSOR -> createPresenceSensorModule();
+            case GESTURE_CAMERA -> createGesturCameraModule();
         };
     }
+
 
     private static Module createPresenceSensorModule() {
         return new PresenceSensorModule();
@@ -24,5 +26,7 @@ public class ModuleFactory {
     private static Module createSocketModule() {
         return new SocketModule();
     }
+
+    private static Module createGesturCameraModule() {return new GestureCameraModule();}
 
 }
